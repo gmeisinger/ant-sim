@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.asp": "vbs",
+    "*.inc": "vbs",
+    "engine.h": "c"
+  }
+}
