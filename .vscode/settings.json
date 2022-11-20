@@ -2,6 +2,7 @@
   "files.associations": {
     "*.asp": "vbs",
     "*.inc": "vbs",
-    "engine.h": "c"
+    "engine.h": "c",
+    "stddef.h": "c"
   }
 }

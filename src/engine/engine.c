@@ -1,8 +1,9 @@
-#include "./include/engine.h"
+#include "engine.h"
 
-int engine_init() {
-  //Engine* engine = malloc(sizeof(Engine));
-  
+int engine_init()
+{
+  // Engine* engine = malloc(sizeof(Engine));
+
   initscr();
   curs_set(0);
   noecho();
@@ -13,6 +14,7 @@ int engine_init() {
   refresh();
 }
 
-engine_exit() {
+engine_exit()
+{
   endwin();
 }

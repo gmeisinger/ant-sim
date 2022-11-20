@@ -1,6 +1,8 @@
 #ifndef statemanager_h
 #define statemanager_h
 
+//#include "state.h"
+
 typedef unsigned int (*fnPtr)();
 typedef unsigned int (*fnPtrFl)(float);
 
@@ -12,7 +14,8 @@ typedef struct
   fnPtr destroy;
 } State;
 
-typedef struct {
+typedef struct
+{
   State **stack;
   int capacity;
   int top;

@@ -1,0 +1,16 @@
+AlignConsecutiveMacros: AcrossEmptyLinesAndComments
+AlignConsecutiveAssignments: true
+AlignOperands: true
+AlignAfterOpenBracket: Align
+AlignEscapedNewlines: Left
+AlignTrailingComments: true
+AllowShortIfStatementsOnASingleLine: Never
+SortIncludes: false
+BreakBeforeBraces: GNU
+BinPackArguments: true
+BinPackParameters: true
+ExperimentalAutoDetectBinPacking: true
+AlignArrayOfStructures: Left
+PointerAlignment: Right
+TabWidth: 2
+ColumnLimit: 0

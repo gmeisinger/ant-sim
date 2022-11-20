@@ -2,15 +2,21 @@
 ####################### Makefile Template ##############################
 ########################################################################
 
+INC_DIRS = -I./src \
+					 -I./src/data_structures \
+					 -I./src/direction \
+					 -I./src/engine \
+					 -I./src/statemanager \
+
 # Compiler settings - Can be customized.
 CC = gcc
-CXXFLAGS = -Wall
-CFLAGS = -Wall
+CXXFLAGS = -Wall $(INC_DIRS)
+CFLAGS = -Wall $(INC_DIRS)
 #LDFLIBS = -lncurses
 LDFLAGS = -lncurses
 
 # Makefile settings - Can be customized.
-APPNAME = cursive
+APPNAME = antspiral
 EXT = .c
 SRCDIR = src
 OBJDIR = obj
