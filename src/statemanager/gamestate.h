@@ -14,3 +14,5 @@ typedef struct
 
 int gamestate_init(gamestate_t *gamestate);
 int gamestate_update(gamestate_t *gamestate, float delta);
+
+#endif

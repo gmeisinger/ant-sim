@@ -1,26 +1,42 @@
 #include "engine.h"
 #include "statemanager.h"
 #include "gametime.h"
+//#include <time.h>
 #include <stdlib.h>
 
 static int running = 1;
 
 unsigned int init_gamestate()
 {
-  return 0;
+ mvprintw(0, 0, "%.6f", 0.6969);
 }
 
 unsigned int update_gamestate(float dt)
 {
+  // int input = getch();
+  // if (input == KEY_BACKSPACE)
+  //   {
+
+  //     running = -1;
+  //   }
 }
 
 unsigned int draw_gamestate(float dt)
 {
+  clear();
+  // iterate over map
+  for (int y = 0; y < LINES - 1; y++)
+    {
+      for (int x = 0; x < COLS - 1; x++)
+        {
+          mvaddch(y, x, '.');
+        }
+    }
   // render some debug info
-  mvprintw(maxlines, 0, "%.6f", dt);
+  mvprintw(0, 0, "%.6f", dt);
 }
 
-int main()
+int main(int argc, char **argv)
 {
   engine_init();
 
@@ -28,27 +44,32 @@ int main()
   int maxlines = LINES - 1;
   int maxcols  = COLS - 1;
 
-  StateManager statemanager;
-
-  State gamestate = {0};
-
   refresh();
 
-  int msec = 0, trigger = 1000; /* 10ms */
-  clock_t before = clock();
+  int msec = 0;
+  int trigger = 10000; /* 100ms */
 
   init_gamestate();
-
+  clock_t before = clock();
   while (running)
     {
+      // input = getch();
+      // if (input == KEY_BACKSPACE)
+      //   {
+      //     return 0;
+      //   }
       clock_t delta = clock() - before;
-      msec          = delta * 1000 / CLOCKS_PER_SEC;
-      if (msec > trigger)
-        {
-          msec = 0;
-          update_gamestate(delta * 1000);
-          draw_gamestate(delta * 1000);
-        }
+      // update_gamestate(delta);
+      // draw_gamestate(delta);
+      //msec = delta * 1000 / CLOCKS_PER_SEC;
+      // if (msec > trigger)
+      //   {
+      //     // update_gamestate(delta);
+      //     // draw_gamestate(delta);
+      //     mvprintw(0, 0, "%.6f", msec);
+      //     before = clock();
+      //   }
+      mvprintw(0, 0, "fuck c");
       refresh();
     }
 

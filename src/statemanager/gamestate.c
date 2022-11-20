@@ -10,6 +10,6 @@ int gamestate_draw()
 
 int gamestate_init(gamestate_t *gamestate)
 {
-  state->update = gamestate_update;
-  state->draw   = gamestate_draw;
+  gamestate->state->update = gamestate_update;
+  gamestate->state->draw   = gamestate_draw;
 }

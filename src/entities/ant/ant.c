@@ -1,4 +1,3 @@
-#include "entity.h"
 #include "ant.h"
 #include "direction.h"
 
@@ -8,7 +7,6 @@
 
 #define CURRENT_TILE_INDEX 5 /* from zero */
 
-static entity_t *self;
 
 void ant_init(ant_t **ant, entity_state_t *state)
 {
@@ -16,13 +14,13 @@ void ant_init(ant_t **ant, entity_state_t *state)
   (*ant)->dir = init_direction();
 }
 
-void ant_update(entity_state_t *current_state)
+void ant_update(ant_t *ant, entity_state_t *current_state)
 {
   static uint8_t valid_tiles;
-  tile_t *next_selected_tile;
+  tile_t *next_selected_tile = NULL;
 
   int max_pheremone = 0;
-  for (unsigned i = 0; i < sizeof(current_state->surroundings) / sizeof(tile_t); i++)
+  for (unsigned i = 0; i < sizeof(current_state->surroundings) / sizeof(tile_t *); i++)
     {
       tile_t *tile = current_state->surroundings[i];
 
@@ -31,7 +29,7 @@ void ant_update(entity_state_t *current_state)
           if (tile->has_food)
             {
               tile->has_food = false;
-              has_food       = true;
+              ant->has_food       = true;
               break;
             }
           if (tile->has_ant)
@@ -87,11 +85,10 @@ void ant_update(entity_state_t *current_state)
           /**
            * CALCULATE NEW TILE BASED ON PHEREMONE LEVEL
            */
-          if (next)
+          // if (next)
         }
     }
 
-  last_pos = current_state->pos;
 }
 
 void ant_destroy(ant_t **ant)

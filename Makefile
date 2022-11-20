@@ -6,12 +6,13 @@ INC_DIRS = -I./src \
 					 -I./src/data_structures \
 					 -I./src/direction \
 					 -I./src/engine \
+					 -I./src/entities/ant \
 					 -I./src/statemanager \
 
 # Compiler settings - Can be customized.
 CC = gcc
-CXXFLAGS = -Wall $(INC_DIRS)
-CFLAGS = -Wall $(INC_DIRS)
+CXXFLAGS = -g -Wall $(INC_DIRS)
+CFLAGS = -g -Wall $(INC_DIRS)
 #LDFLIBS = -lncurses
 LDFLAGS = -lncurses
 
@@ -22,7 +23,7 @@ SRCDIR = src
 OBJDIR = obj
 
 ############## Do not change anything from here downwards! #############
-SRC = $(wildcard $(SRCDIR)/*$(EXT))
+SRC = $(shell find $(SRCDIR) -name '*.c')
 OBJ = $(SRC:$(SRCDIR)/%$(EXT)=$(OBJDIR)/%.o)
 DEP = $(OBJ:$(OBJDIR)/%.o=%.d)
 # UNIX-based OS variables & settings
@@ -52,6 +53,7 @@ $(APPNAME): $(OBJ)
 
 # Building rule for .o files and its .c/.cpp in combination with all .h
 $(OBJDIR)/%.o: $(SRCDIR)/%$(EXT)
+	@mkdir -p $(dir $@)
 	$(CC) $(CXXFLAGS) -o $@ -c $<
 
 ################### Cleaning rules for Unix-based OS ###################

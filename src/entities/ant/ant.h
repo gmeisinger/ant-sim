@@ -1,8 +1,24 @@
 #ifndef _ANT_H_
 #define _ANT_H_
 
-#include "entity.h"
 #include <stdint.h>
+
+#include "food.h"
+#include "tile.h"
+#include <stdbool.h>
+
+typedef struct
+{
+  int x;
+  int y;
+} position_t;
+
+typedef struct
+{
+  position_t pos;
+  uint8_t dir;
+  tile_t *surroundings[9];
+} entity_state_t;
 
 typedef struct
 {
@@ -11,5 +27,7 @@ typedef struct
 } ant_t;
 
 void ant_init(ant_t **ant, entity_state_t *state);
+void ant_update(ant_t *ant, entity_state_t *state);
+void ant_destroy(ant_t **ant);
 
 #endif /* _ANT_H_ */

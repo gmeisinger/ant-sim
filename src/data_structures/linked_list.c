@@ -1,4 +1,5 @@
 #include "linked_list.h"
+#include <stdlib.h>
 #include <stddef.h>
 
 llist_t *llist_create(void)
@@ -6,7 +7,7 @@ llist_t *llist_create(void)
   llist_t *list = malloc(sizeof(llist_t));
   *list         = malloc(sizeof(struct node));
 
-  struct node *new_node = list;
+  struct node *new_node = (struct node *)list;
   new_node->data        = NULL;
   new_node->next        = NULL;
 
@@ -42,15 +43,20 @@ void llist_add(llist_t *list, void *data)
 
   node->next = new_node;
 }
-void llist_remove(llist_t *list, struct node *node)
+void llist_remove(llist_t *node_)
 {
+  struct node *node = (struct node *)*node_;
   if (node->next != NULL)
     {
-      node->data = node->next->data;
-      node->next = node->next->next;
+      struct node *next_node = node->next;
+      node->data = next_node->data;
+      node->next = next_node->next;
+      free(next_node);
+      next_node = NULL;
     }
   else
     {
       free(node);
+      node = NULL;
     }
 }

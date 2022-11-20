@@ -1,4 +1,5 @@
 #include "direction.h"
+#include <stdlib.h>
 
 uint8_t init_direction(void)
 {
