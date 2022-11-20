@@ -12,14 +12,19 @@ void ant_init(ant_t **ant, entity_state_t *state)
 {
   *ant        = malloc(sizeof(ant_t));
   (*ant)->dir = init_direction();
+  state->pos.x = 40;
+  state->pos.y = 13;
 }
 
 void ant_update(ant_t *ant, entity_state_t *current_state)
 {
+  return;
+
   static uint8_t valid_tiles;
   tile_t *next_selected_tile = NULL;
 
   int max_pheremone = 0;
+  
   for (unsigned i = 0; i < sizeof(current_state->surroundings) / sizeof(tile_t *); i++)
     {
       tile_t *tile = current_state->surroundings[i];

@@ -16,7 +16,6 @@ typedef struct
 typedef struct
 {
   position_t pos;
-  uint8_t dir;
   tile_t *surroundings[9];
 } entity_state_t;
 

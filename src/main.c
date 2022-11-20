@@ -1,24 +1,45 @@
 #include "engine.h"
+#include "ant.h"
+#include "direction.h"
 #include "statemanager.h"
 #include "gametime.h"
 //#include <time.h>
 #include <stdlib.h>
 
+#define SPAWN_TIMER 2000
+#define FRAME_TIME 500
+
 static int running = 1;
+static ant_t *ant = NULL;
+static entity_state_t state;
 
 unsigned int init_gamestate()
 {
- mvprintw(0, 0, "%.6f", 0.6969);
+  ant_init(&ant, &state);
 }
 
 unsigned int update_gamestate(float dt)
 {
-  // int input = getch();
-  // if (input == KEY_BACKSPACE)
-  //   {
-
-  //     running = -1;
-  //   }
+  ant_update(ant, &state);
+/**
+ * CALCULATE DIRECTION
+ */
+if (ant->dir & NORTH)
+  {
+    state.pos.y--;
+  }
+if (ant->dir & EAST)
+  {
+    state.pos.x++;
+  }
+if (ant->dir & SOUTH)
+  {
+    state.pos.y++;
+  }
+if (ant->dir & WEST)
+  {
+    state.pos.x--;
+  }
 }
 
 unsigned int draw_gamestate(float dt)
@@ -32,11 +53,11 @@ unsigned int draw_gamestate(float dt)
           mvaddch(y, x, '.');
         }
     }
+  mvaddch(state.pos.y, state.pos.x, '@');
   // render some debug info
-  mvprintw(0, 0, "%.6f", dt);
 }
 
-int main(int argc, char **argv)
+int main()
 {
   engine_init();
 
@@ -46,11 +67,12 @@ int main(int argc, char **argv)
 
   refresh();
 
-  int msec = 0;
-  int trigger = 10000; /* 100ms */
+  clock_t msec  = 0;
+  clock_t spawn_timer = 0;
 
   init_gamestate();
   clock_t before = clock();
+
   while (running)
     {
       // input = getch();
@@ -59,17 +81,17 @@ int main(int argc, char **argv)
       //     return 0;
       //   }
       clock_t delta = clock() - before;
-      // update_gamestate(delta);
-      // draw_gamestate(delta);
-      //msec = delta * 1000 / CLOCKS_PER_SEC;
-      // if (msec > trigger)
-      //   {
-      //     // update_gamestate(delta);
-      //     // draw_gamestate(delta);
-      //     mvprintw(0, 0, "%.6f", msec);
-      //     before = clock();
-      //   }
-      mvprintw(0, 0, "fuck c");
+      msec = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
+      //spawn_timer +=
+      if (msec > FRAME_TIME)
+        {
+          clear();
+          update_gamestate(delta);
+          draw_gamestate(delta);
+          mvprintw(0, 0, "%d", msec);
+          before = clock();
+        }
+      // mvprintw(0, 0, "%ull", delta);
       refresh();
     }
 

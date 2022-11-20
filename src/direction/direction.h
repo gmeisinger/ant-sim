@@ -10,31 +10,3 @@
 #define SOUTHWEST (SOUTH | WEST)
 
 uint8_t init_direction(void);
-
-/**
- * CALCULATE DIRECTION
- */
-// if (dir & NORTHEAST)
-//   {
-//   }
-// else if (dir & NORTHWEST)
-//   {
-//   }
-// else if (dir & SOUTHEAST)
-//   {
-//   }
-// else if (dir & SOUTHWEST)
-//   {
-//   }
-// else if (dir & NORTH)
-//   {
-//   }
-// else if (dir & EAST)
-//   {
-//   }
-// else if (dir & SOUTH)
-//   {
-//   }
-// else if (dir & WEST)
-//   {
-//   }

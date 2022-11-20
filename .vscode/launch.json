@@ -7,7 +7,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}",
       "program": "${workspaceFolder}/antspiral",
-      "stopAtEntry": true,
+      "stopAtEntry": false,
       "MIMode": "lldb",
       "externalConsole": true
     },

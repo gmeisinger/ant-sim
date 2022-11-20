@@ -1,16 +1,21 @@
 #include "direction.h"
 #include <stdlib.h>
+#include <time.h>
 
 uint8_t init_direction(void)
 {
   /**
    * Calculate random direction, for passing into the `init` state
    */
-
+  time_t t;
+  srand((unsigned) time(&t));
+  
   // either cardinal dir, or compound(?) dir.
-  uint8_t start_dir = (rand() & 2) + 1; // 1 - 2
+  uint8_t start_dir = (rand() & 8);  // 0 - 3
+  if(start_dir >= 5)
+  {
+    start_dir++;
+  }
 
-  // random 4-bit shift the random direction.
-  uint8_t shift = rand() % 4; // 0 - 3
-  start_dir <<= shift;
+  return start_dir;
 }
