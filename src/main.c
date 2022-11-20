@@ -1,45 +1,49 @@
 #include "engine.h"
 #include "ant.h"
+#include "tile.h"
 #include "direction.h"
 #include "statemanager.h"
 #include "gametime.h"
-//#include <time.h>
 #include <stdlib.h>
 
 #define SPAWN_TIMER 2000
-#define FRAME_TIME 500
+#define FRAME_TIME  500
 
 static int running = 1;
-static ant_t *ant = NULL;
+static ant_t *ant  = NULL;
 static entity_state_t state;
 
 unsigned int init_gamestate()
 {
   ant_init(&ant, &state);
+  for (uint8_t i = 0; i < sizeof(state.surroundings) / sizeof(tile_t *); i++)
+    {
+      state.surroundings[i] = malloc(sizeof(tile_t));
+    }
 }
 
 unsigned int update_gamestate(float dt)
 {
   ant_update(ant, &state);
-/**
- * CALCULATE DIRECTION
- */
-if (ant->dir & NORTH)
-  {
-    state.pos.y--;
-  }
-if (ant->dir & EAST)
-  {
-    state.pos.x++;
-  }
-if (ant->dir & SOUTH)
-  {
-    state.pos.y++;
-  }
-if (ant->dir & WEST)
-  {
-    state.pos.x--;
-  }
+  /**
+   * CALCULATE DIRECTION
+   */
+  if (ant->dir & NORTH)
+    {
+      state.pos.y--;
+    }
+  if (ant->dir & EAST)
+    {
+      state.pos.x++;
+    }
+  if (ant->dir & SOUTH)
+    {
+      state.pos.y++;
+    }
+  if (ant->dir & WEST)
+    {
+      state.pos.x--;
+    }
 }
 
 unsigned int draw_gamestate(float dt)
@@ -67,7 +71,7 @@ int main()
 
   refresh();
 
-  clock_t msec  = 0;
+  clock_t msec        = 0;
   clock_t spawn_timer = 0;
 
   init_gamestate();
@@ -81,8 +85,8 @@ int main()
       //     return 0;
       //   }
       clock_t delta = clock() - before;
-      msec = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
-      //spawn_timer +=
+      msec          = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
+      // spawn_timer +=
       if (msec > FRAME_TIME)
         {
           clear();

@@ -3,6 +3,18 @@
     "*.asp": "vbs",
     "*.inc": "vbs",
     "engine.h": "c",
-    "stddef.h": "c"
-  }
+    "stddef.h": "c",
+    "direction.h": "c",
+    "ant.h": "c",
+    "gametime.h": "c",
+    "statemanager.h": "c",
+    "linked_list.h": "c"
+  },
+  "makefile.launchConfigurations": [
+    {
+      "cwd": "/Users/donnie/Documents/ant-sim",
+      "binaryPath": "/Users/donnie/Documents/ant-sim/antspiral",
+      "binaryArgs": []
+    }
+  ]
 }

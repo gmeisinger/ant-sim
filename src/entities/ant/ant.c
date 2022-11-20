@@ -7,34 +7,35 @@
 
 #define CURRENT_TILE_INDEX 5 /* from zero */
 
-
 void ant_init(ant_t **ant, entity_state_t *state)
 {
-  *ant        = malloc(sizeof(ant_t));
-  (*ant)->dir = init_direction();
+  *ant         = malloc(sizeof(ant_t));
+  (*ant)->dir  = init_direction();
   state->pos.x = 40;
   state->pos.y = 13;
 }
 
 void ant_update(ant_t *ant, entity_state_t *current_state)
 {
-  return;
-
   static uint8_t valid_tiles;
   tile_t *next_selected_tile = NULL;
+  // int max_pheremone = 0;
 
-  int max_pheremone = 0;
-  
   for (unsigned i = 0; i < sizeof(current_state->surroundings) / sizeof(tile_t *); i++)
     {
       tile_t *tile = current_state->surroundings[i];
+      if (tile == NULL)
+        {
+          valid_tiles &= ~(1 << i);
+          continue;
+        }
 
       if (i == CURRENT_TILE_INDEX)
         {
           if (tile->has_food)
             {
               tile->has_food = false;
-              ant->has_food       = true;
+              ant->has_food  = true;
               break;
             }
           if (tile->has_ant)
@@ -45,14 +46,6 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
         }
       else
         {
-          /**
-           * GET VALID TILES (account for edges)
-           */
-          if (tile->pheremone == -1)
-            {
-              valid_tiles &= ~(1 << i);
-              continue;
-            }
           valid_tiles |= (1 << i);
 
           /**
@@ -68,21 +61,24 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
               // TODO: finish
               break;
             }
-
-          // /**
-          //  * CALCULATE NEW TILE BASED ON PHEREMONE LEVEL
-          //  */
-          // if (next_selected_tile == NULL)
-          //   {
-          //     next_selected_tile = tile;
-          //   }
-          // else
-          //   {
-          //     if (next_selected_tile->pheremone < tile->pheremone)
-          //       {
-          //         next_selected_tile = tile;
-          //       }
-          //   }
+          else
+            {
+              // /**
+              //  * CALCULATE NEW TILE BASED ON PHEREMONE LEVEL
+              //  */
+              // if (next_selected_tile == NULL)
+              //   {
+              //     next_selected_tile = tile;
+              //   }
+              // else
+              //   {
+              //     if (next_selected_tile->pheremone < tile->pheremone)
+              //       {
+              //         next_selected_tile = tile;
+              //       }
+              //   }
+              ant->dir = init_direction();
+            }
         }
 
       if (next_selected_tile == NULL)
@@ -93,7 +89,6 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
           // if (next)
         }
     }
-
 }
 
 void ant_destroy(ant_t **ant)

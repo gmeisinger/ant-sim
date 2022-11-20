@@ -9,4 +9,7 @@
 #define SOUTHEAST (SOUTH | EAST)
 #define SOUTHWEST (SOUTH | WEST)
 
+/**
+ * Calculate random initial direction
+ */
 uint8_t init_direction(void);
