@@ -1,18 +1,22 @@
-#ifndef gamestate_h
-#define gamestate_h
+#ifndef _GAMESTATE_H_
+#define _GAMESTATE_H_
 
-#include "../data_structures/linked_list.h"
+#include "engine.h"
+#include "tile.h"
+#include "camera.h"
+#include "ant.h"
+#include "direction.h"
+#include "gametime.h"
 
-#include "statemanager.h"
-#include "../entities/ant/ant.h"
+#include <stdlib.h>
 
-typedef struct
-{
-  llist_t *ants;
-  State *state;
-} gamestate_t;
+#define MAP_WIDTH   100
+#define MAP_HEIGHT  100
 
-int gamestate_init(gamestate_t *gamestate);
-int gamestate_update(gamestate_t *gamestate, float delta);
+unsigned int gamestate_init();
+unsigned int gamestate_update_input(int input);
+unsigned int gamestate_update_state();
+unsigned int gamestate_draw(float delta);
+unsigned int gamestate_update(float delta);
 
 #endif

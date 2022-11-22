@@ -8,6 +8,8 @@ INC_DIRS = -I./src \
 					 -I./src/engine \
 					 -I./src/entities/ant \
 					 -I./src/statemanager \
+					 -I./src/camera \
+					 -I./src/tile \
 
 # Compiler settings - Can be customized.
 CC = gcc

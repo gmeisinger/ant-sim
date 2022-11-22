@@ -7,12 +7,12 @@
 
 #define CURRENT_TILE_INDEX 5 /* from zero */
 
-void ant_init(ant_t **ant, entity_state_t *state)
+void ant_init(ant_t **ant, entity_state_t *state, int x, int y)
 {
   *ant         = malloc(sizeof(ant_t));
   (*ant)->dir  = init_direction();
-  state->pos.x = 40;
-  state->pos.y = 13;
+  state->pos.x = x;
+  state->pos.y = y;
 }
 
 void ant_update(ant_t *ant, entity_state_t *current_state)
@@ -32,6 +32,9 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
 
       if (i == CURRENT_TILE_INDEX)
         {
+          //&tiles[current_state->pos.x][current_state->pos.y]->pheremone += 1;
+          
+          //map_tile->pheremone += 1;
           if (tile->has_food)
             {
               tile->has_food = false;

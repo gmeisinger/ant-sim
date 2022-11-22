@@ -1,5 +1,5 @@
-#ifndef statemanager_h
-#define statemanager_h
+#ifndef _STATEMANAGER_H_
+#define _STATEMANAGER_H_
 
 //#include "state.h"
 

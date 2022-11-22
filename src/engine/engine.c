@@ -6,9 +6,10 @@ int engine_init()
 
   initscr();
   curs_set(0);
-  noecho();
   keypad(stdscr, true);
   nodelay(stdscr, true);
+  noecho();
+  //timeout(-1);
 
   clear();
   refresh();

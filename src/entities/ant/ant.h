@@ -25,7 +25,7 @@ typedef struct
   bool has_food;
 } ant_t;
 
-void ant_init(ant_t **ant, entity_state_t *state);
+void ant_init(ant_t **ant, entity_state_t *state, int x, int y);
 void ant_update(ant_t *ant, entity_state_t *state);
 void ant_destroy(ant_t **ant);
 
