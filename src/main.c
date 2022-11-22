@@ -4,61 +4,181 @@
 #include "direction.h"
 #include "statemanager.h"
 #include "gametime.h"
+#include "linked_list.h"
 #include <stdlib.h>
 
 #define SPAWN_TIMER 2000
 #define FRAME_TIME  500
+int maxlines;
+int maxcols;
 
 static int running = 1;
-static ant_t *ant  = NULL;
-static entity_state_t state;
+
+llist_t *ant_list = NULL;
+tile_t **tiles;
+
+static inline bool above(unsigned x, unsigned limit)
+{
+  return x >= limit - 1;
+}
+static inline bool below(unsigned x, unsigned limit)
+{
+  return x <= limit;
+}
+static void set_ant_surroundings(ant_t *ant, tile_t **tiles)
+{
+  ant->dir &= 0x0F;
+
+  for (uint8_t j = 0; j < (sizeof(ant->surroundings) / sizeof(tile_t *)); j++)
+    {
+      unsigned x = ant->pos.x, y = ant->pos.y;
+
+      if (j == 0)
+        {
+          y -= !y ? 0 : 1;
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (below(y, 0) || below(x, 0)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 1)
+        {
+          y -= !y ? 0 : 1;
+          ant->surroundings[j] = (below(y, 0)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 7); // NORTH is valid
+        }
+      else if (j == 2)
+        {
+          y -= !y ? 0 : 1;
+          x += 1;
+          ant->surroundings[j] = (below(y, 0) || above(x, maxcols)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 3)
+        {
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (below(x, 0)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 6); // WEST is valid
+        }
+      else if (j == 4)
+        {
+          ant->surroundings[j] = &tiles[x][y];
+        }
+      else if (j == 5)
+        {
+          x += 1;
+          ant->surroundings[j] = (above(x, maxcols)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 4); // EAST is valid
+        }
+      else if (j == 6)
+        {
+          y += 1;
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (above(y, maxlines) || below(x, 0)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 7)
+        {
+          y += 1;
+          ant->surroundings[j] = (above(y, maxlines)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 5); // SOUTH is valid
+        }
+      else if (j == 8)
+        {
+          y += 1;
+          x += 1;
+          ant->surroundings[j] = (above(y, maxlines) || above(x, maxcols)) ? NULL : &tiles[x][y];
+        }
+    }
+}
 
 unsigned int init_gamestate()
 {
-  ant_init(&ant, &state);
-  for (uint8_t i = 0; i < sizeof(state.surroundings) / sizeof(tile_t *); i++)
+  /**
+   * INIT RANDOMNESS
+   */
+  time_t t;
+  srand((unsigned)time(&t));
+
+  /**
+   * INIT 2D TILES ARRAY
+   */
+  tiles = malloc(sizeof(tile_t *)); // Create `tile_t**`
+  for (int i = 0; i < maxcols; i++) // For `max width`
     {
-      state.surroundings[i] = malloc(sizeof(tile_t));
+      // Create a column of tiles, of size `max height`
+      tiles[i] = malloc(sizeof(tile_t) * maxlines);
+    }
+
+#define ANT_COUNT 10
+  /**
+   * INIT ANTS
+   */
+  llist_create(&ant_list); // Init linked list handle for ants
+  ant_t ants[ANT_COUNT];   // Create ant structs
+  for (int i = 0; i < ANT_COUNT; i++)
+    {
+      ant_t *ant = &ants[i];
+      ant_init(&ant, maxcols / 2, maxlines / 2); // Initialize ant
+      set_ant_surroundings(ant, tiles);          // Provide adjacent tiles to ant
+      llist_add(ant_list, ant);                  // Add to end of list
     }
 }
 
 unsigned int update_gamestate(float dt)
 {
-  ant_update(ant, &state);
   /**
-   * CALCULATE DIRECTION
+   * UPDATE ANTS
    */
-  if (ant->dir & NORTH)
+  struct node *node = *ant_list;
+  while (node->next != NULL) // For each ant...
     {
-      state.pos.y--;
-    }
-  if (ant->dir & EAST)
-    {
-      state.pos.x++;
-    }
-  if (ant->dir & SOUTH)
-    {
-      state.pos.y++;
-    }
-  if (ant->dir & WEST)
-    {
-      state.pos.x--;
+      ant_t *ant = (ant_t *)node->data;
+      node       = node->next;
+
+      // Calculate next position for ant
+      if (ant->dir & NORTH)
+        {
+          ant->pos.y -= !ant->pos.y ? 0 : 1;
+        }
+      if (ant->dir & EAST)
+        {
+          ant->pos.x += ant->pos.x >= maxcols - 1 ? 0 : 1;
+        }
+      if (ant->dir & SOUTH)
+        {
+          ant->pos.y += ant->pos.y >= maxlines - 1 ? 0 : 1;
+        }
+      if (ant->dir & WEST)
+        {
+          ant->pos.x -= !ant->pos.x ? 0 : 1;
+        }
+      set_ant_surroundings(ant, tiles); // Set new adjacent tiles
+      ant_update(ant);                  // Handle ant update
     }
 }
 
 unsigned int draw_gamestate(float dt)
 {
   clear();
-  // iterate over map
-  for (int y = 0; y < LINES - 1; y++)
+
+  /**
+   * DRAW MAP
+   */
+  for (int y = 0; y < maxlines; y++)
     {
-      for (int x = 0; x < COLS - 1; x++)
+      for (int x = 0; x < maxcols; x++)
         {
           mvaddch(y, x, '.');
         }
     }
-  mvaddch(state.pos.y, state.pos.x, '@');
-  // render some debug info
+
+  /**
+   * DRAW ANTS
+   */
+  struct node *node = *ant_list;
+  while (node->next != NULL)
+    {
+      ant_t *ant = (ant_t *)node->data;
+      node       = node->next;
+      mvaddch(ant->pos.y, ant->pos.x, '@');
+    }
 }
 
 int main()
@@ -66,8 +186,8 @@ int main()
   engine_init();
 
   int input;
-  int maxlines = LINES - 1;
-  int maxcols  = COLS - 1;
+  maxlines = LINES;
+  maxcols  = COLS;
 
   refresh();
 
@@ -79,23 +199,15 @@ int main()
 
   while (running)
     {
-      // input = getch();
-      // if (input == KEY_BACKSPACE)
-      //   {
-      //     return 0;
-      //   }
       clock_t delta = clock() - before;
       msec          = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
-      // spawn_timer +=
       if (msec > FRAME_TIME)
         {
           clear();
           update_gamestate(delta);
           draw_gamestate(delta);
-          mvprintw(0, 0, "%d", msec);
           before = clock();
         }
-      // mvprintw(0, 0, "%ull", delta);
       refresh();
     }
 

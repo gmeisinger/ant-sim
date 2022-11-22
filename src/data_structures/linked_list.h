@@ -8,7 +8,7 @@ struct node
 };
 typedef struct node *llist_t;
 
-llist_t *llist_create(void);
+void llist_create(llist_t **list);
 void llist_destroy(llist_t *list);
 
 void llist_add(llist_t *list, void *data);

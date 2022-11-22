@@ -2,16 +2,14 @@
 #include <stdlib.h>
 #include <stddef.h>
 
-llist_t *llist_create(void)
+void llist_create(llist_t **list)
 {
-  llist_t *list = malloc(sizeof(llist_t));
-  *list         = malloc(sizeof(struct node));
+  *list  = malloc(sizeof(llist_t));
+  **list = malloc(sizeof(struct node));
 
-  struct node *new_node = (struct node *)list;
-  new_node->data        = NULL;
-  new_node->next        = NULL;
-
-  return list;
+  struct node *node = (struct node *)**list;
+  node->data        = NULL;
+  node->next        = NULL;
 }
 
 void llist_destroy(llist_t *list)
@@ -31,16 +29,17 @@ void llist_destroy(llist_t *list)
 
 void llist_add(llist_t *list, void *data)
 {
-  struct node *node = (struct node *)list;
-  while (node != NULL)
+  struct node *node = (struct node *)*list;
+  while (node->next != NULL)
     {
       node = node->next;
     }
 
   struct node *new_node = malloc(sizeof(struct node));
-  new_node->data        = data;
+  new_node->data        = NULL;
   new_node->next        = NULL;
 
+  node->data = data;
   node->next = new_node;
 }
 void llist_remove(llist_t *node_)
@@ -49,8 +48,8 @@ void llist_remove(llist_t *node_)
   if (node->next != NULL)
     {
       struct node *next_node = node->next;
-      node->data = next_node->data;
-      node->next = next_node->next;
+      node->data             = next_node->data;
+      node->next             = next_node->next;
       free(next_node);
       next_node = NULL;
     }

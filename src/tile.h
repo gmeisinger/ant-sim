@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-
 typedef int pheremone_level_t;
 
 typedef struct

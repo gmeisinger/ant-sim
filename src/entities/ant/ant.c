@@ -5,25 +5,25 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-#define CURRENT_TILE_INDEX 5 /* from zero */
+#define CURRENT_TILE_INDEX 4 /* from zero */
 
-void ant_init(ant_t **ant, entity_state_t *state)
+void ant_init(ant_t **ant, int x, int y)
 {
-  *ant         = malloc(sizeof(ant_t));
-  (*ant)->dir  = init_direction();
-  state->pos.x = 40;
-  state->pos.y = 13;
+  *ant          = malloc(sizeof(ant_t));
+  (*ant)->pos.x = x;
+  (*ant)->pos.y = y;
+  init_direction(&(*ant)->dir);
 }
 
-void ant_update(ant_t *ant, entity_state_t *current_state)
+void ant_update(ant_t *ant)
 {
   static uint8_t valid_tiles;
   tile_t *next_selected_tile = NULL;
   // int max_pheremone = 0;
 
-  for (unsigned i = 0; i < sizeof(current_state->surroundings) / sizeof(tile_t *); i++)
+  for (unsigned i = 0; i < sizeof(ant->surroundings) / sizeof(tile_t *); i++)
     {
-      tile_t *tile = current_state->surroundings[i];
+      tile_t *tile = ant->surroundings[i];
       if (tile == NULL)
         {
           valid_tiles &= ~(1 << i);
@@ -32,17 +32,17 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
 
       if (i == CURRENT_TILE_INDEX)
         {
-          if (tile->has_food)
-            {
-              tile->has_food = false;
-              ant->has_food  = true;
-              break;
-            }
-          if (tile->has_ant)
-            {
-              // TODO: finish
-              break;
-            }
+          // if (tile->has_food)
+          //   {
+          //     tile->has_food = false;
+          //     ant->has_food  = true;
+          //     break;
+          //   }
+          // if (tile->has_ant)
+          //   {
+          //     // TODO: finish
+          //     break;
+          //   }
         }
       else
         {
@@ -51,34 +51,33 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
           /**
            * TEST TILE CONDITIONS
            */
-          if (tile->has_food)
-            {
-              next_selected_tile = tile;
-              break;
-            }
-          else if (tile->has_ant)
-            {
-              // TODO: finish
-              break;
-            }
-          else
-            {
-              // /**
-              //  * CALCULATE NEW TILE BASED ON PHEREMONE LEVEL
-              //  */
-              // if (next_selected_tile == NULL)
-              //   {
-              //     next_selected_tile = tile;
-              //   }
-              // else
-              //   {
-              //     if (next_selected_tile->pheremone < tile->pheremone)
-              //       {
-              //         next_selected_tile = tile;
-              //       }
-              //   }
-              ant->dir = init_direction();
-            }
+          // if (tile->has_food)
+          //   {
+          //     next_selected_tile = tile;
+          //     break;
+          //   }
+          // else if (tile->has_ant)
+          //   {
+          //     // TODO: finish
+          //     break;
+          //   }
+          // else
+          //   {
+          // /**
+          //  * CALCULATE NEW TILE BASED ON PHEREMONE LEVEL
+          //  */
+          // if (next_selected_tile == NULL)
+          //   {
+          //     next_selected_tile = tile;
+          //   }
+          // else
+          //   {
+          //     if (next_selected_tile->pheremone < tile->pheremone)
+          //       {
+          //         next_selected_tile = tile;
+          //       }
+          //   }
+          // }
         }
 
       if (next_selected_tile == NULL)
@@ -88,6 +87,8 @@ void ant_update(ant_t *ant, entity_state_t *current_state)
            */
           // if (next)
         }
+      ant->dir |= (valid_tiles << 4);
+      next_direction(&ant->dir);
     }
 }
 

@@ -17,16 +17,12 @@ typedef struct
 {
   position_t pos;
   tile_t *surroundings[9];
-} entity_state_t;
-
-typedef struct
-{
   uint8_t dir;
   bool has_food;
 } ant_t;
 
-void ant_init(ant_t **ant, entity_state_t *state);
-void ant_update(ant_t *ant, entity_state_t *state);
+void ant_init(ant_t **ant, int x, int y);
+void ant_update(ant_t *ant);
 void ant_destroy(ant_t **ant);
 
 #endif /* _ANT_H_ */

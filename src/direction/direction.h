@@ -12,4 +12,6 @@
 /**
  * Calculate random initial direction
  */
-uint8_t init_direction(void);
+void init_direction(uint8_t *dir);
+
+void next_direction(uint8_t *dir);
