@@ -145,8 +145,6 @@ int main()
       before = clock();
       refresh();
       usleep(FRAME_TIME_MS * 1000);
-      refresh();
-      usleep(FRAME_TIME_MS * 1000);
     }
 
   endwin();

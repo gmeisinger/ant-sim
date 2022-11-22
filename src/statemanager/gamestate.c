@@ -4,7 +4,7 @@
 #define MIN(x, y)   (((x) < (y)) ? (x) : (y))
 
 #define SPAWN_TIMER 2000
-#define GAME_TICK   .05
+#define GAME_TICK   5
 
 static int running        = 1;
 static float update_timer = 0.0;
