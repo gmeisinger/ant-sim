@@ -6,39 +6,126 @@
 #define SPAWN_TIMER 2000
 #define GAME_TICK   .05
 
-static int running = 1;
+static int running        = 1;
 static float update_timer = 0.0;
-static ant_t *ant  = NULL;
-static entity_state_t state;
+static ant_t *ant         = NULL;
 
 static camera_t *camera;
 static tile_t ***tiles;
+static llist_t *ant_list;
 // static tile_t *tiles[MAP_WIDTH][MAP_HEIGHT];
+
+static inline bool above(unsigned x, unsigned limit)
+{
+  return x >= limit - 1;
+}
+static inline bool below(unsigned x, unsigned limit)
+{
+  return x <= limit;
+}
+static void set_ant_surroundings(ant_t *ant, tile_t **tiles)
+{
+  ant->dir &= 0x0F;
+
+  for (uint8_t j = 0; j < (sizeof(ant->surroundings) / sizeof(tile_t *)); j++)
+    {
+      unsigned x = ant->pos.x, y = ant->pos.y;
+
+      if (j == 0)
+        {
+          y -= !y ? 0 : 1;
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (below(y, 0) || below(x, 0)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 1)
+        {
+          y -= !y ? 0 : 1;
+          ant->surroundings[j] = (below(y, 0)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 7); // NORTH is valid
+        }
+      else if (j == 2)
+        {
+          y -= !y ? 0 : 1;
+          x += 1;
+          ant->surroundings[j] = (below(y, 0) || above(x, MAP_WIDTH)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 3)
+        {
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (below(x, 0)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 6); // WEST is valid
+        }
+      else if (j == 4)
+        {
+          ant->surroundings[j] = &tiles[x][y];
+        }
+      else if (j == 5)
+        {
+          x += 1;
+          ant->surroundings[j] = (above(x, MAP_WIDTH)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 4); // EAST is valid
+        }
+      else if (j == 6)
+        {
+          y += 1;
+          x -= !x ? 0 : 1;
+          ant->surroundings[j] = (above(y, MAP_HEIGHT) || below(x, 0)) ? NULL : &tiles[x][y];
+        }
+      else if (j == 7)
+        {
+          y += 1;
+          ant->surroundings[j] = (above(y, MAP_HEIGHT)) ? NULL : &tiles[x][y];
+          ant->dir |= ((ant->surroundings[j] != NULL) << 5); // SOUTH is valid
+        }
+      else if (j == 8)
+        {
+          y += 1;
+          x += 1;
+          ant->surroundings[j] = (above(y, MAP_HEIGHT) || above(x, MAP_WIDTH)) ? NULL : &tiles[x][y];
+        }
+    }
+}
 
 unsigned int gamestate_init()
 {
+  /**
+   * INIT RANDOMNESS
+   */
+  time_t t;
+  srand((unsigned)time(&t));
+
+  /**
+   * INIT 2D TILES ARRAY
+   */
+  tiles = malloc(sizeof(tile_t *));   // Create `tile_t**`
+  for (int i = 0; i < MAP_WIDTH; i++) // For `max width`
+    {
+      // Create a column of tiles, of size `max height`
+      tiles[i] = malloc(sizeof(tile_t) * MAP_HEIGHT);
+    }
+
+  /**
+   * INIT CAMERA
+   */
   camera = malloc(sizeof(camera_t));
-  tiles = malloc(sizeof(tile_t **) * MAP_WIDTH);
 
   camera->w = 80;
   camera->h = 24;
   camera->x = 0;
   camera->y = 0;
 
-  // init map
-  for (int x = 0; x < MAP_WIDTH; x++)
+#define ANT_COUNT 10
+  /**
+   * INIT ANTS
+   */
+  llist_create(&ant_list); // Init linked list handle for ants
+  ant_t ants[ANT_COUNT];   // Create ant structs
+  for (int i = 0; i < ANT_COUNT; i++)
     {
-      tiles[x] = malloc(sizeof(tile_t *) * MAP_HEIGHT);
-      for (int y = 0; y < MAP_HEIGHT; y++)
-        {
-          tile_init((tile_t *)&tiles[x][y]);
-        }
-    }
-  // init ants
-  ant_init(&ant, &state, 40, 12);
-  for (uint8_t i = 0; i < sizeof(state.surroundings) / sizeof(tile_t *); i++)
-    {
-      state.surroundings[i] = malloc(sizeof(tile_t));
+      ant_t *ant = &ants[i];
+      ant_init(&ant, MAP_WIDTH / 2, MAP_HEIGHT / 2); // Initialize ant
+      set_ant_surroundings(ant, tiles);              // Provide adjacent tiles to ant
+      llist_add(ant_list, ant);                      // Add to end of list
     }
 }
 unsigned int gamestate_update_input(int input)
@@ -63,25 +150,34 @@ unsigned int gamestate_update_input(int input)
 }
 unsigned int gamestate_update_state()
 {
-  ant_update(ant, &state);
   /**
-   * CALCULATE DIRECTION
+   * UPDATE ANTS
    */
-  if (ant->dir & NORTH)
+  struct node *node = *ant_list;
+  while (node->next != NULL) // For each ant...
     {
-      state.pos.y--;
-    }
-  if (ant->dir & EAST)
-    {
-      state.pos.x++;
-    }
-  if (ant->dir & SOUTH)
-    {
-      state.pos.y++;
-    }
-  if (ant->dir & WEST)
-    {
-      state.pos.x--;
+      ant_t *ant = (ant_t *)node->data;
+      node       = node->next;
+
+      // Calculate next position for ant
+      if (ant->dir & NORTH)
+        {
+          ant->pos.y -= !ant->pos.y ? 0 : 1;
+        }
+      if (ant->dir & EAST)
+        {
+          ant->pos.x += ant->pos.x >= MAP_WIDTH - 1 ? 0 : 1;
+        }
+      if (ant->dir & SOUTH)
+        {
+          ant->pos.y += ant->pos.y >= MAP_HEIGHT - 1 ? 0 : 1;
+        }
+      if (ant->dir & WEST)
+        {
+          ant->pos.x -= !ant->pos.x ? 0 : 1;
+        }
+      set_ant_surroundings(ant, tiles); // Set new adjacent tiles
+      ant_update(ant);                  // Handle ant update
     }
 }
 unsigned int gamestate_draw(float delta)
@@ -92,14 +188,23 @@ unsigned int gamestate_draw(float delta)
     {
       for (int x = 0; x < camera->w; x++)
         {
-          char tile = '.'; //tile_render(map[camera->x + x][camera->y + y]);
-          //char tile = tile_render((tile_t)*tiles[camera->x + x][camera->y + y]);
+          //char tile = '.'; // tile_render(map[camera->x + x][camera->y + y]);
+          char tile = tile_render((tile_t)*tiles[camera->x + x][camera->y + y]);
           mvaddch(y, x, tile);
         }
     }
-  if (state.pos.y >= camera->y && state.pos.y <= camera->y + camera->h && state.pos.x >= camera->x && state.pos.x <= camera->x + camera->w)
+  /**
+   * DRAW ANTS
+   */
+  struct node *node = *ant_list;
+  while (node->next != NULL)
     {
-      mvaddch(state.pos.y - camera->y, state.pos.x - camera->x, '@');
+      ant_t *ant = (ant_t *)node->data;
+      node       = node->next;
+      if (ant->pos.y >= camera->y && ant->pos.y <= camera->y + camera->h && ant->pos.x >= camera->x && ant->pos.x <= camera->x + camera->w)
+        {
+          mvaddch(ant->pos.y - camera->y, ant->pos.x - camera->x, '@');
+        }
     }
 }
 
@@ -108,9 +213,9 @@ unsigned int gamestate_update(float delta)
   update_timer += delta;
   int input = getch();
   gamestate_update_input(input);
-  if(update_timer > GAME_TICK)
-  {
-    update_timer = 0.0;
-    gamestate_update_state();
-  }
+  if (update_timer > GAME_TICK)
+    {
+      update_timer = 0.0;
+      gamestate_update_state();
+    }
 }

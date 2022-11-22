@@ -7,6 +7,7 @@
 #include "ant.h"
 #include "direction.h"
 #include "gametime.h"
+#include "linked_list.h"
 
 #include <stdlib.h>
 
