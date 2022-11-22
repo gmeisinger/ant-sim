@@ -1,217 +1,155 @@
 #include "engine.h"
-#include "ant.h"
-#include "tile.h"
-#include "direction.h"
-#include "statemanager.h"
+// #include "ant.h"
+// #include "tile.h"
+// #include "direction.h"
+// #include "statemanager.h"
 #include "gametime.h"
 #include "linked_list.h"
+// #include "camera.h"
+
+#include "gamestate.h"
+
 #include <stdlib.h>
 
+// #define MAX(x, y)   (((x) > (y)) ? (x) : (y))
+// #define MIN(x, y)   (((x) < (y)) ? (x) : (y))
+
+// #define MAP_WIDTH   100
+// #define MAP_HEIGHT  100
+
 #define SPAWN_TIMER 2000
-#define FRAME_TIME  500
-int maxlines;
-int maxcols;
+#define FRAME_TICK  30
 
-static int running = 1;
+// static int running = 1;
+// static ant_t *ant  = NULL;
+// static entity_state_t state;
 
-llist_t *ant_list = NULL;
-tile_t **tiles;
+// unsigned int init_gamestate(tile_t **tiles, camera_t *camera)
+// {
+//   camera->w = 80;
+//   camera->h = 12;
+//   // camera->x = map_width / 2 - (camera->w / 2);
+//   // camera->y = map_height / 2 - (camera->h / 2);
+//   camera->x = 0;
+//   camera->y = 0;
 
-static inline bool above(unsigned x, unsigned limit)
-{
-  return x >= limit - 1;
-}
-static inline bool below(unsigned x, unsigned limit)
-{
-  return x <= limit;
-}
-static void set_ant_surroundings(ant_t *ant, tile_t **tiles)
-{
-  ant->dir &= 0x0F;
+//   // init map
+//   for (int x = 0; x < MAP_WIDTH; x++)
+//     {
+//       tiles[x] = malloc(sizeof(tile_t) * MAP_HEIGHT);
+//       for (int y = 0; y < MAP_HEIGHT; y++)
+//         {
+//           tile_init((tile_t *)&tiles[x][y]);
+//         }
+//     }
+//   // init ants
+//   ant_init(&ant, &state, 40, 12);
+//   for (uint8_t i = 0; i < sizeof(state.surroundings) / sizeof(tile_t *); i++)
+//     {
+//       state.surroundings[i] = malloc(sizeof(tile_t));
+//     }
+// }
 
-  for (uint8_t j = 0; j < (sizeof(ant->surroundings) / sizeof(tile_t *)); j++)
-    {
-      unsigned x = ant->pos.x, y = ant->pos.y;
+// unsigned int update_input_gamestate(int input, camera_t *camera)
+// {
+//   // handle input
+//   if (input == KEY_LEFT)
+//     {
+//       camera->x = MAX(0, MIN(MAP_WIDTH - camera->w, camera->x - 1));
+//     }
+//   if (input == KEY_RIGHT)
+//     {
+//       camera->x = MAX(0, MIN(MAP_WIDTH - camera->w, camera->x + 1));
+//     }
+//   if (input == KEY_UP)
+//     {
+//       camera->y = MAX(0, MIN(MAP_HEIGHT - camera->h, camera->y - 1));
+//     }
+//   if (input == KEY_DOWN)
+//     {
+//       camera->y = MAX(0, MIN(MAP_HEIGHT - camera->h, camera->y + 1));
+//     }
+// }
 
-      if (j == 0)
-        {
-          y -= !y ? 0 : 1;
-          x -= !x ? 0 : 1;
-          ant->surroundings[j] = (below(y, 0) || below(x, 0)) ? NULL : &tiles[x][y];
-        }
-      else if (j == 1)
-        {
-          y -= !y ? 0 : 1;
-          ant->surroundings[j] = (below(y, 0)) ? NULL : &tiles[x][y];
-          ant->dir |= ((ant->surroundings[j] != NULL) << 7); // NORTH is valid
-        }
-      else if (j == 2)
-        {
-          y -= !y ? 0 : 1;
-          x += 1;
-          ant->surroundings[j] = (below(y, 0) || above(x, maxcols)) ? NULL : &tiles[x][y];
-        }
-      else if (j == 3)
-        {
-          x -= !x ? 0 : 1;
-          ant->surroundings[j] = (below(x, 0)) ? NULL : &tiles[x][y];
-          ant->dir |= ((ant->surroundings[j] != NULL) << 6); // WEST is valid
-        }
-      else if (j == 4)
-        {
-          ant->surroundings[j] = &tiles[x][y];
-        }
-      else if (j == 5)
-        {
-          x += 1;
-          ant->surroundings[j] = (above(x, maxcols)) ? NULL : &tiles[x][y];
-          ant->dir |= ((ant->surroundings[j] != NULL) << 4); // EAST is valid
-        }
-      else if (j == 6)
-        {
-          y += 1;
-          x -= !x ? 0 : 1;
-          ant->surroundings[j] = (above(y, maxlines) || below(x, 0)) ? NULL : &tiles[x][y];
-        }
-      else if (j == 7)
-        {
-          y += 1;
-          ant->surroundings[j] = (above(y, maxlines)) ? NULL : &tiles[x][y];
-          ant->dir |= ((ant->surroundings[j] != NULL) << 5); // SOUTH is valid
-        }
-      else if (j == 8)
-        {
-          y += 1;
-          x += 1;
-          ant->surroundings[j] = (above(y, maxlines) || above(x, maxcols)) ? NULL : &tiles[x][y];
-        }
-    }
-}
+// unsigned int update_gamestate(tile_t **map, camera_t *camera)
+// {
 
-unsigned int init_gamestate()
-{
-  /**
-   * INIT RANDOMNESS
-   */
-  time_t t;
-  srand((unsigned)time(&t));
+//   ant_update(ant, &state);
+//   /**
+//    * CALCULATE DIRECTION
+//    */
+//   if (ant->dir & NORTH)
+//     {
+//       state.pos.y--;
+//     }
+//   if (ant->dir & EAST)
+//     {
+//       state.pos.x++;
+//     }
+//   if (ant->dir & SOUTH)
+//     {
+//       state.pos.y++;
+//     }
+//   if (ant->dir & WEST)
+//     {
+//       state.pos.x--;
+//     }
+// }
 
-  /**
-   * INIT 2D TILES ARRAY
-   */
-  tiles = malloc(sizeof(tile_t *)); // Create `tile_t**`
-  for (int i = 0; i < maxcols; i++) // For `max width`
-    {
-      // Create a column of tiles, of size `max height`
-      tiles[i] = malloc(sizeof(tile_t) * maxlines);
-    }
-
-#define ANT_COUNT 10
-  /**
-   * INIT ANTS
-   */
-  llist_create(&ant_list); // Init linked list handle for ants
-  ant_t ants[ANT_COUNT];   // Create ant structs
-  for (int i = 0; i < ANT_COUNT; i++)
-    {
-      ant_t *ant = &ants[i];
-      ant_init(&ant, maxcols / 2, maxlines / 2); // Initialize ant
-      set_ant_surroundings(ant, tiles);          // Provide adjacent tiles to ant
-      llist_add(ant_list, ant);                  // Add to end of list
-    }
-}
-
-unsigned int update_gamestate(float dt)
-{
-  /**
-   * UPDATE ANTS
-   */
-  struct node *node = *ant_list;
-  while (node->next != NULL) // For each ant...
-    {
-      ant_t *ant = (ant_t *)node->data;
-      node       = node->next;
-
-      // Calculate next position for ant
-      if (ant->dir & NORTH)
-        {
-          ant->pos.y -= !ant->pos.y ? 0 : 1;
-        }
-      if (ant->dir & EAST)
-        {
-          ant->pos.x += ant->pos.x >= maxcols - 1 ? 0 : 1;
-        }
-      if (ant->dir & SOUTH)
-        {
-          ant->pos.y += ant->pos.y >= maxlines - 1 ? 0 : 1;
-        }
-      if (ant->dir & WEST)
-        {
-          ant->pos.x -= !ant->pos.x ? 0 : 1;
-        }
-      set_ant_surroundings(ant, tiles); // Set new adjacent tiles
-      ant_update(ant);                  // Handle ant update
-    }
-}
-
-unsigned int draw_gamestate(float dt)
-{
-  clear();
-
-  /**
-   * DRAW MAP
-   */
-  for (int y = 0; y < maxlines; y++)
-    {
-      for (int x = 0; x < maxcols; x++)
-        {
-          mvaddch(y, x, '.');
-        }
-    }
-
-  /**
-   * DRAW ANTS
-   */
-  struct node *node = *ant_list;
-  while (node->next != NULL)
-    {
-      ant_t *ant = (ant_t *)node->data;
-      node       = node->next;
-      mvaddch(ant->pos.y, ant->pos.x, '@');
-    }
-}
+// unsigned int draw_gamestate(tile_t **map, camera_t *camera)
+// {
+//   clear();
+//   // iterate over map
+//   for (int y = 0; y < camera->h; y++)
+//     {
+//       for (int x = 0; x < camera->w; x++)
+//         {
+//           // char tile = '.'; //tile_render(map[camera->x + x][camera->y + y]);
+//           char tile = tile_render((tile_t)map[camera->x + x][camera->y + y]);
+//           mvaddch(y, x, tile);
+//         }
+//     }
+//   if(state.pos.y >= camera->y && state.pos.y <= camera->y + camera->h && state.pos.x >= camera->x && state.pos.x <= camera->x + camera->w)
+//   {
+//     mvaddch(state.pos.y - camera->y, state.pos.x - camera->x, '@');
+//   }
+  
+//   // mvaddch(state.pos.y, state.pos.x, '@');
+//   //  render some debug info
+// }
 
 int main()
 {
   engine_init();
 
+  bool running = true;
   int input;
-  maxlines = LINES;
-  maxcols  = COLS;
 
   refresh();
 
-  clock_t msec        = 0;
-  clock_t spawn_timer = 0;
+  float msec        = 0.0;
+  float frame_timer = 0.0;
 
-  init_gamestate();
+  // init_gamestate(tiles, camera);
+  gamestate_init();
   clock_t before = clock();
 
   while (running)
     {
       clock_t delta = clock() - before;
-      msec          = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
-      if (msec > FRAME_TIME)
+      msec          = (float)(delta * 1000) / CLOCKS_PER_SEC;
+      frame_timer += msec;
+      if (frame_timer > FRAME_TICK)
         {
-          clear();
-          update_gamestate(delta);
-          draw_gamestate(delta);
-          before = clock();
+          frame_timer = 0.0;
+          erase();
+          gamestate_update(msec);
+          gamestate_draw(msec);
         }
+      before = clock();
       refresh();
     }
 
-  curs_set(0);
   endwin();
   return 0;
 }
