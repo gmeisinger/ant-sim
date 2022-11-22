@@ -6,14 +6,16 @@
 #include "gametime.h"
 #include "linked_list.h"
 #include <stdlib.h>
+#include <unistd.h>
 
-#define SPAWN_TIMER 2000
-#define FRAME_TIME  500
+#define SPAWN_TIMER   2000
+#define FRAME_TIME_MS 500
 int maxlines;
 int maxcols;
 
 static int running = 1;
 
+#define ANT_COUNT 10
 llist_t *ant_list = NULL;
 tile_t **tiles;
 
@@ -88,7 +90,7 @@ static void set_ant_surroundings(ant_t *ant, tile_t **tiles)
     }
 }
 
-unsigned int init_gamestate()
+void init_gamestate()
 {
   /**
    * INIT RANDOMNESS
@@ -106,7 +108,6 @@ unsigned int init_gamestate()
       tiles[i] = malloc(sizeof(tile_t) * maxlines);
     }
 
-#define ANT_COUNT 10
   /**
    * INIT ANTS
    */
@@ -121,7 +122,7 @@ unsigned int init_gamestate()
     }
 }
 
-unsigned int update_gamestate(float dt)
+void update_gamestate(void)
 {
   /**
    * UPDATE ANTS
@@ -154,7 +155,7 @@ unsigned int update_gamestate(float dt)
     }
 }
 
-unsigned int draw_gamestate(float dt)
+void draw_gamestate(void)
 {
   clear();
 
@@ -185,30 +186,20 @@ int main()
 {
   engine_init();
 
-  int input;
   maxlines = LINES;
   maxcols  = COLS;
 
   refresh();
 
-  clock_t msec        = 0;
-  clock_t spawn_timer = 0;
-
   init_gamestate();
-  clock_t before = clock();
 
   while (running)
     {
-      clock_t delta = clock() - before;
-      msec          = (clock_t)delta * 1000 / CLOCKS_PER_SEC;
-      if (msec > FRAME_TIME)
-        {
-          clear();
-          update_gamestate(delta);
-          draw_gamestate(delta);
-          before = clock();
-        }
+      clear();
+      update_gamestate();
+      draw_gamestate();
       refresh();
+      usleep(FRAME_TIME_MS * 1000);
     }
 
   curs_set(0);
