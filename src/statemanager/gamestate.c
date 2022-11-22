@@ -97,16 +97,6 @@ unsigned int gamestate_init()
   /**
    * INIT 2D TILES ARRAY
    */
-  // tiles = malloc(sizeof(tile_t **) * MAP_WIDTH);
-  // for (int x = 0; x < MAP_WIDTH; x++)
-  //   {
-  //     tiles[x] = malloc(sizeof(tile_t *) * MAP_HEIGHT);
-  //     for (int y = 0; y < MAP_HEIGHT; y++)
-  //       {
-  //         tile_init((tile_t *)&tiles[x][y]);
-  //       }
-  //   }
-
   tiles = malloc(sizeof(tile_t *));   // Create `tile_t**`
   for (int x = 0; x < MAP_WIDTH; x++) // For `max width`
     {
