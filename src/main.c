@@ -8,6 +8,7 @@
 #include "gamestate.h"
 
 #include <stdlib.h>
+#include <unistd.h>
 
 // #define MAX(x, y)   (((x) > (y)) ? (x) : (y))
 // #define MIN(x, y)   (((x) < (y)) ? (x) : (y))
@@ -15,8 +16,8 @@
 // #define MAP_WIDTH   100
 // #define MAP_HEIGHT  100
 
-#define SPAWN_TIMER 2000
-#define FRAME_TICK  30
+#define SPAWN_TIMER   2000
+#define FRAME_TIME_MS 30
 
 // static int running = 1;
 // static ant_t *ant  = NULL;
@@ -111,7 +112,7 @@
 //   {
 //     mvaddch(state.pos.y - camera->y, state.pos.x - camera->x, '@');
 //   }
-  
+
 //   // mvaddch(state.pos.y, state.pos.x, '@');
 //   //  render some debug info
 // }
@@ -136,16 +137,16 @@ int main()
     {
       clock_t delta = clock() - before;
       msec          = (float)(delta * 1000) / CLOCKS_PER_SEC;
-      frame_timer += msec;
-      if (frame_timer > FRAME_TICK)
-        {
-          frame_timer = 0.0;
-          erase();
-          gamestate_update(msec);
-          gamestate_draw(msec);
-        }
+
+      erase();
+      gamestate_update(msec);
+      gamestate_draw(msec);
+
       before = clock();
       refresh();
+      usleep(FRAME_TIME_MS * 1000);
+      refresh();
+      usleep(FRAME_TIME_MS * 1000);
     }
 
   endwin();
