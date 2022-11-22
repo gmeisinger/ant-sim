@@ -5,8 +5,6 @@
 // #include "statemanager.h"
 #include "gametime.h"
 #include "linked_list.h"
-// #include "camera.h"
-
 #include "gamestate.h"
 
 #include <stdlib.h>

@@ -11,7 +11,7 @@ static float update_timer = 0.0;
 static ant_t *ant         = NULL;
 
 static camera_t *camera;
-static tile_t ***tiles;
+static tile_t **tiles;
 static llist_t *ant_list;
 // static tile_t *tiles[MAP_WIDTH][MAP_HEIGHT];
 
@@ -97,11 +97,25 @@ unsigned int gamestate_init()
   /**
    * INIT 2D TILES ARRAY
    */
+  // tiles = malloc(sizeof(tile_t **) * MAP_WIDTH);
+  // for (int x = 0; x < MAP_WIDTH; x++)
+  //   {
+  //     tiles[x] = malloc(sizeof(tile_t *) * MAP_HEIGHT);
+  //     for (int y = 0; y < MAP_HEIGHT; y++)
+  //       {
+  //         tile_init((tile_t *)&tiles[x][y]);
+  //       }
+  //   }
+
   tiles = malloc(sizeof(tile_t *));   // Create `tile_t**`
-  for (int i = 0; i < MAP_WIDTH; i++) // For `max width`
+  for (int x = 0; x < MAP_WIDTH; x++) // For `max width`
     {
       // Create a column of tiles, of size `max height`
-      tiles[i] = malloc(sizeof(tile_t) * MAP_HEIGHT);
+      tiles[x] = malloc(sizeof(tile_t) * MAP_HEIGHT);
+      for (int y = 0; y < MAP_HEIGHT; y++)
+        {
+          tile_init(&tiles[x][y]);
+        }
     }
 
   /**
@@ -123,9 +137,9 @@ unsigned int gamestate_init()
   for (int i = 0; i < ANT_COUNT; i++)
     {
       ant_t *ant = &ants[i];
-      ant_init(&ant, MAP_WIDTH / 2, MAP_HEIGHT / 2); // Initialize ant
-      set_ant_surroundings(ant, tiles);              // Provide adjacent tiles to ant
-      llist_add(ant_list, ant);                      // Add to end of list
+      ant_init(&ant, 80 / 2, 24 / 2);   // Initialize ant
+      set_ant_surroundings(ant, tiles); // Provide adjacent tiles to ant
+      llist_add(ant_list, ant);         // Add to end of list
     }
 }
 unsigned int gamestate_update_input(int input)
@@ -188,8 +202,8 @@ unsigned int gamestate_draw(float delta)
     {
       for (int x = 0; x < camera->w; x++)
         {
-          //char tile = '.'; // tile_render(map[camera->x + x][camera->y + y]);
-          char tile = tile_render((tile_t)*tiles[camera->x + x][camera->y + y]);
+          // char tile = '.'; // tile_render(map[camera->x + x][camera->y + y]);
+          char tile = tile_render(tiles[camera->x + x][camera->y + y]);
           mvaddch(y, x, tile);
         }
     }
