@@ -28,14 +28,14 @@ int sm_free(StateManager *statemanager)
 
 int sm_push(StateManager *statemanager, State *state)
 {
-  if (statemanager->top == -1)
-    return 0;
-  State *top = sm_top(statemanager);
-  if (top->destroy != NULL)
-    top->destroy();
-  statemanager->stack[statemanager->top] = NULL;
-  statemanager->top--;
-  return statemanager->top;
+  if (statemanager -> top + 1 == statemanager -> capacity) sm_scale(statemanager);
+  statemanager -> top++;
+  statemanager -> stack[statemanager -> top] = state;
+  if (state -> init != NULL)
+  {
+    state -> init();
+  } 
+  return statemanager -> top;
 }
 
 int sm_pop(StateManager *statemanager)
@@ -44,7 +44,9 @@ int sm_pop(StateManager *statemanager)
     return 0;
   State *top = sm_top(statemanager);
   if (top->destroy != NULL)
+  {
     top->destroy();
+  }
   statemanager->stack[statemanager->top] = NULL;
   statemanager->top--;
   return statemanager->top;
@@ -55,11 +57,11 @@ State *sm_top(StateManager *statemanager)
   return statemanager->stack[statemanager->top];
 }
 
-int sm_update(StateManager *statemanager, float deltatime)
+int sm_update(StateManager *statemanager, float deltatime, int input)
 {
   State *state = sm_top(statemanager);
   if (state->update != NULL)
-    return state->update(deltatime);
+    return state->update(deltatime, input);
   return 1;
 }
 

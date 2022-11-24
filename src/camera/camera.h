@@ -4,10 +4,10 @@
 #include <stdint.h>
 
 typedef struct {
-  uint8_t x;
-  uint8_t y;
-  uint8_t w;
-  uint8_t h;
+  unsigned int x;
+  unsigned int y;
+  unsigned int w;
+  unsigned int h;
 } camera_t;
 
 #endif /*_CAMERA_H_*/

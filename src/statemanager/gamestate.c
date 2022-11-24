@@ -6,14 +6,17 @@
 #define SPAWN_TIMER 2000
 #define GAME_TICK   5
 
-static int running        = 1;
-static float update_timer = 0.0;
-static ant_t *ant         = NULL;
+//static int running        = 1;
 
-static camera_t *camera;
-static tile_t **tiles;
-static llist_t *ant_list;
-// static tile_t *tiles[MAP_WIDTH][MAP_HEIGHT];
+// static camera_t *camera;
+// static tile_t **tiles;
+// static llist_t *ant_list;
+// static float update_timer;
+
+camera_t *camera;
+tile_t **tiles;
+llist_t *ant_list;
+float update_timer;
 
 static inline bool above(unsigned x, unsigned limit)
 {
@@ -113,8 +116,8 @@ unsigned int gamestate_init()
    */
   camera = malloc(sizeof(camera_t));
 
-  camera->w = 80;
-  camera->h = 24;
+  camera->w = MIN(MAP_WIDTH, COLS);
+  camera->h = MIN(MAP_HEIGHT, LINES);
   camera->x = 0;
   camera->y = 0;
 
@@ -131,6 +134,8 @@ unsigned int gamestate_init()
       set_ant_surroundings(ant, tiles); // Provide adjacent tiles to ant
       llist_add(ant_list, ant);         // Add to end of list
     }
+    update_timer = 0.0;
+    return 0;
 }
 unsigned int gamestate_update_input(int input)
 {
@@ -151,7 +156,9 @@ unsigned int gamestate_update_input(int input)
     {
       camera->y = MAX(0, MIN(MAP_HEIGHT - camera->h, camera->y + 1));
     }
+    return 0;
 }
+
 unsigned int gamestate_update_state()
 {
   /**
@@ -181,19 +188,23 @@ unsigned int gamestate_update_state()
           ant->pos.x -= !ant->pos.x ? 0 : 1;
         }
       set_ant_surroundings(ant, tiles); // Set new adjacent tiles
+      // Increase pheremone levels
+      //(tile_t*)(&tiles[ant->pos.x][ant->pos.y])->pheremone = 1;
       ant_update(ant);                  // Handle ant update
     }
+    return 0;
 }
+
 unsigned int gamestate_draw(float delta)
 {
-  clear();
+  erase();
   // iterate over map
   for (int y = 0; y < camera->h; y++)
     {
       for (int x = 0; x < camera->w; x++)
         {
           // char tile = '.'; // tile_render(map[camera->x + x][camera->y + y]);
-          char tile = tile_render(tiles[camera->x + x][camera->y + y]);
+          char tile = tile_render(&tiles[camera->x + x][camera->y + y]);
           mvaddch(y, x, tile);
         }
     }
@@ -210,16 +221,33 @@ unsigned int gamestate_draw(float delta)
           mvaddch(ant->pos.y - camera->y, ant->pos.x - camera->x, '@');
         }
     }
+    return 0;
 }
 
-unsigned int gamestate_update(float delta)
+unsigned int gamestate_update(float delta, int input)
 {
   update_timer += delta;
-  int input = getch();
+  if(input == KEY_ENTER) { exit(0); }
   gamestate_update_input(input);
   if (update_timer > GAME_TICK)
     {
       update_timer = 0.0;
       gamestate_update_state();
     }
+  return 0;
+}
+
+unsigned int gamestate_destroy()
+{
+  // destroy ants
+  llist_destroy(ant_list);
+  // destroy tiles
+  for(int i = 0; i<MAP_WIDTH;i++)
+  {
+    free(tiles[i]);
+  }
+  free(tiles);
+  // destroy camera
+  free(camera);
+  return 0;
 }

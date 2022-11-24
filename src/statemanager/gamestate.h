@@ -11,13 +11,19 @@
 
 #include <stdlib.h>
 
-#define MAP_WIDTH   100
-#define MAP_HEIGHT  100
+#define MAP_WIDTH   512
+#define MAP_HEIGHT  512
+
+// camera_t *camera;
+// tile_t **tiles;
+// llist_t *ant_list;
+// float update_timer;
 
 unsigned int gamestate_init();
 unsigned int gamestate_update_input(int input);
 unsigned int gamestate_update_state();
 unsigned int gamestate_draw(float delta);
-unsigned int gamestate_update(float delta);
+unsigned int gamestate_update(float delta, int input);
+unsigned int gamestate_destroy();
 
 #endif

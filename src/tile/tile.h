@@ -13,6 +13,6 @@ typedef struct
 } tile_t;
 
 int tile_init(tile_t *tile);
-char tile_render(tile_t tile);
+char tile_render(tile_t *tile);
 
 #endif /* _TILE_H_ */

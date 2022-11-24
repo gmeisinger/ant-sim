@@ -14,13 +14,13 @@ int tile_init(tile_t *tile)
   }
 }
 
-char tile_render(tile_t tile)
+char tile_render(tile_t *tile)
 {
-  if(tile.pheremone > 0)
+  if(tile->pheremone > 0)
   {
     return 'p';
   }
-  else if (tile.has_food)
+  else if (tile->has_food)
   {
     return 'F';
   }
