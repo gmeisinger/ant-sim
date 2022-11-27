@@ -212,7 +212,20 @@ unsigned int gamestate_draw(float delta)
       node       = node->next;
       if (ant->pos.y >= camera->y && ant->pos.y <= camera->y + camera->h && ant->pos.x >= camera->x && ant->pos.x <= camera->x + camera->w)
         {
-          mvaddch(ant->pos.y - camera->y, ant->pos.x - camera->x, '@');
+          char antchar = '.';
+          if ((ant->dir & NORTH || ant->dir & SOUTH) && (!(ant->dir & EAST) && !(ant->dir & WEST))) {
+            antchar = '|';
+          }
+          if ((ant->dir & NORTH && ant->dir & EAST) || (ant->dir & SOUTH && ant->dir & WEST)) {
+            antchar = '/';
+          }
+          if ((ant->dir & EAST || ant->dir & WEST) && (!(ant->dir & NORTH) && !(ant->dir & SOUTH))) {
+            antchar = '-';
+          }
+          if ((ant->dir & NORTH && ant->dir & WEST) || (ant->dir & SOUTH && ant->dir & EAST))  {
+            antchar = '\\';
+          }
+          mvaddch(ant->pos.y - camera->y, ant->pos.x - camera->x, antchar);
         }
     }
     return 0;

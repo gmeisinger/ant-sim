@@ -12,11 +12,12 @@ int tile_init(tile_t *tile)
   {
     tile->has_food = true;
   }
+  return 0;
 }
 
 char tile_render(tile_t *tile)
 {
-  if(tile->pheremone > 0)
+  if(tile->pheremone > 10)
   {
     return 'p';
   }
