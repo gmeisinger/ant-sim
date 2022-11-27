@@ -73,7 +73,7 @@ int main()
       sm_draw(&statemanager, msec);
       before = clock();
       refresh();
-      usleep(FRAME_TIME_MS * 1000);
+      usleep(FRAME_TIME_MS);
     }
 
   endwin();

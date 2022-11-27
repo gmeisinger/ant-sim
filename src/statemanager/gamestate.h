@@ -14,11 +14,6 @@
 #define MAP_WIDTH   512
 #define MAP_HEIGHT  512
 
-// camera_t *camera;
-// tile_t **tiles;
-// llist_t *ant_list;
-// float update_timer;
-
 unsigned int gamestate_init();
 unsigned int gamestate_update_input(int input);
 unsigned int gamestate_update_state();

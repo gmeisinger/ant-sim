@@ -3,7 +3,7 @@
 int engine_init()
 {
   // Engine* engine = malloc(sizeof(Engine));
-
+  setlocale(LC_CTYPE, "");
   initscr();
   curs_set(0);
   keypad(stdscr, true);

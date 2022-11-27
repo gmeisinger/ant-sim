@@ -6,13 +6,6 @@
 #define SPAWN_TIMER 2000
 #define GAME_TICK   5
 
-//static int running        = 1;
-
-// static camera_t *camera;
-// static tile_t **tiles;
-// static llist_t *ant_list;
-// static float update_timer;
-
 camera_t *camera;
 tile_t **tiles;
 llist_t *ant_list;
@@ -140,7 +133,7 @@ unsigned int gamestate_init()
 unsigned int gamestate_update_input(int input)
 {
   // handle input
-  if (input == KEY_LEFT)
+  if (input == KEY_LEFT && camera->x != 0)
     {
       camera->x = MAX(0, MIN(MAP_WIDTH - camera->w, camera->x - 1));
     }
@@ -148,7 +141,7 @@ unsigned int gamestate_update_input(int input)
     {
       camera->x = MAX(0, MIN(MAP_WIDTH - camera->w, camera->x + 1));
     }
-  if (input == KEY_UP)
+  if (input == KEY_UP && camera->y != 0)
     {
       camera->y = MAX(0, MIN(MAP_HEIGHT - camera->h, camera->y - 1));
     }
@@ -189,7 +182,8 @@ unsigned int gamestate_update_state()
         }
       set_ant_surroundings(ant, tiles); // Set new adjacent tiles
       // Increase pheremone levels
-      //(tile_t*)(&tiles[ant->pos.x][ant->pos.y])->pheremone = 1;
+      tile_t* tile = &tiles[ant->pos.x][ant->pos.y];
+      tile->pheremone += 1;
       ant_update(ant);                  // Handle ant update
     }
     return 0;
